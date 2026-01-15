@@ -1,4 +1,4 @@
-import { Vendor } from './VendorModel';
+import { Vendor } from '../models/VendorModel';
 
 const MOCK_VENDORS: Vendor[] = [
     {
@@ -45,12 +45,21 @@ export const VendorService = {
         });
     },
 
-    getAvailableSlots: (vendorId: string, serviceId: string): Promise<string[]> => {
+    getAvailableSlots: (vendorId: string, serviceId: string, date: Date): Promise<string[]> => {
         return new Promise((resolve) => {
             // Mock slots generation
-            const slots = [];
+            const slots: string[] = [];
             const startHour = 10;
             const endHour = 20;
+
+            // Simple variation based on date to show it's working
+            const dateNum = date.getDate();
+            const offset = dateNum % 2 === 0 ? 0 : 30; // Shift start slightly based on date
+
+            if (offset > 0) {
+                // slots.push(`${startHour - 1}:30`); // Just an example
+            }
+
             for (let h = startHour; h < endHour; h++) {
                 slots.push(`${h}:00`);
                 slots.push(`${h}:30`);

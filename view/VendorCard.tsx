@@ -3,7 +3,8 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
-import { Vendor } from '../data/VendorModel';
+import { Vendor } from '../models/VendorModel';
+import AppIcon from './AppIcon';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -25,7 +26,7 @@ export default function VendorCard({ vendor }: VendorCardProps) {
                 <View style={styles.header}>
                     <Text style={styles.name}>{vendor.name}</Text>
                     <View style={styles.ratingContainer}>
-                        <Text style={styles.star}>★</Text>
+                        <AppIcon name="star" style={styles.star} />
                         <Text style={styles.rating}>{vendor.rating}</Text>
                     </View>
                 </View>

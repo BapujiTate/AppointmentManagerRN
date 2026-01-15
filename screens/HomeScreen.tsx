@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import TopBar from '../components/TopBar';
 import VendorCard from '../view/VendorCard';
 import { VendorService } from '../data/VendorService';
-import { Vendor } from '../data/VendorModel';
+import { Vendor } from '../models/VendorModel';
 
 export default function HomeScreen() {
     const [vendors, setVendors] = useState<Vendor[]>([]);

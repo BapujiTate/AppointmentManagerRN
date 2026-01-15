@@ -3,8 +3,10 @@ import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIn
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { VendorService } from '../data/VendorService';
-import { Vendor } from '../data/VendorModel';
+import { Vendor } from '../models/VendorModel';
 import TimeSlotModal from './TimeSlotModal';
+import { icontheme } from '../theme/icontheme';
+import AppIcon from './AppIcon';
 
 type VendorDetailsRouteProp = RouteProp<RootStackParamList, 'VendorDetails'>;
 
@@ -18,6 +20,8 @@ export default function VendorDetailsScreen() {
     const [selectedService, setSelectedService] = useState<string | null>(null);
     const [slots, setSlots] = useState<string[]>([]);
     const [loadingSlots, setLoadingSlots] = useState(false);
+
+    const [selectedDate, setSelectedDate] = useState(new Date());
 
     useEffect(() => {
         loadVendor();
@@ -33,9 +37,23 @@ export default function VendorDetailsScreen() {
         setSelectedService(serviceId);
         setModalVisible(true);
         setLoadingSlots(true);
-        const availableSlots = await VendorService.getAvailableSlots(vendorId, serviceId);
+
+        const today = new Date();
+        setSelectedDate(today);
+
+        const availableSlots = await VendorService.getAvailableSlots(vendorId, serviceId, today);
         setSlots(availableSlots);
         setLoadingSlots(false);
+    };
+
+    const handleDateChange = async (date: Date) => {
+        setSelectedDate(date);
+        if (selectedService) {
+            setLoadingSlots(true);
+            const availableSlots = await VendorService.getAvailableSlots(vendorId, selectedService, date);
+            setSlots(availableSlots);
+            setLoadingSlots(false);
+        }
     };
 
     if (loading) {
@@ -63,14 +81,14 @@ export default function VendorDetailsScreen() {
                 <Image source={{ uri: vendor.imageUrl }} style={styles.coverImage} />
 
                 <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                    <Text style={styles.backButtonText}>←</Text>
+                    <AppIcon name="arrow-left" size={icontheme.iconSizes.sm} color={icontheme.colors.primary} />
                 </TouchableOpacity>
 
                 <View style={styles.content}>
                     <View style={styles.header}>
                         <Text style={styles.name}>{vendor.name}</Text>
                         <View style={styles.ratingBadge}>
-                            <Text style={styles.star}>★</Text>
+                            <AppIcon name="star" style={styles.star} />
                             <Text style={styles.rating}>{vendor.rating}</Text>
                         </View>
                     </View>
@@ -101,7 +119,7 @@ export default function VendorDetailsScreen() {
                                     <Text style={styles.serviceDuration}>{service.durationMinutes} min</Text>
                                 </View>
                                 <View style={styles.serviceAction}>
-                                    <Text style={styles.servicePrice}>${service.price}</Text>
+                                    <Text style={styles.servicePrice}><AppIcon name="dollar" size={icontheme.iconSizes.sm} color={icontheme.colors.primary} />{service.price}</Text>
                                     <View style={styles.bookServiceButton}>
                                         <Text style={styles.bookServiceButtonText}>Book</Text>
                                     </View>
@@ -117,6 +135,8 @@ export default function VendorDetailsScreen() {
                 onClose={() => setModalVisible(false)}
                 slots={slots}
                 loading={loadingSlots}
+                selectedDate={selectedDate}
+                onDateChange={handleDateChange}
             />
         </View>
     );
@@ -196,12 +216,12 @@ const styles = StyleSheet.create({
     },
     star: {
         color: '#FFD700',
-        fontSize: 14,
+        fontSize: 12,
         marginRight: 4,
     },
     rating: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: 'bold',
     },
     address: {

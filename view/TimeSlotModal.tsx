@@ -6,9 +6,35 @@ interface TimeSlotModalProps {
     onClose: () => void;
     slots: string[];
     loading: boolean;
+    selectedDate: Date;
+    onDateChange: (date: Date) => void;
 }
 
-export default function TimeSlotModal({ visible, onClose, slots, loading }: TimeSlotModalProps) {
+export default function TimeSlotModal({ visible, onClose, slots, loading, selectedDate, onDateChange }: TimeSlotModalProps) {
+    const getDays = () => {
+        const days = [];
+        const today = new Date();
+
+        for (let i = 0; i < 3; i++) {
+            const date = new Date(today);
+            date.setDate(today.getDate() + i);
+            days.push(date);
+        }
+        return days;
+    };
+
+    const days = getDays();
+
+    const formatDateLabel = (date: Date, index: number) => {
+        if (index === 0) return 'Today';
+        if (index === 1) return 'Tomorrow';
+        return date.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+    };
+
+    const isSelected = (date: Date) => {
+        return date.toDateString() === selectedDate.toDateString();
+    };
+
     return (
         <Modal
             animationType="slide"
@@ -25,6 +51,23 @@ export default function TimeSlotModal({ visible, onClose, slots, loading }: Time
                                 <TouchableOpacity onPress={onClose}>
                                     <Text style={styles.closeButton}>✕</Text>
                                 </TouchableOpacity>
+                            </View>
+
+                            <View style={styles.daySelectionContainer}>
+                                {days.map((date, index) => {
+                                    const selected = isSelected(date);
+                                    return (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={[styles.dayTab, selected && styles.selectedDayTab]}
+                                            onPress={() => onDateChange(date)}
+                                        >
+                                            <Text style={[styles.dayText, selected && styles.selectedDayText]}>
+                                                {formatDateLabel(date, index)}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
                             </View>
 
                             {loading ? (
@@ -61,7 +104,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 20,
-        minHeight: 300,
+        minHeight: 400,
     },
     modalHeader: {
         flexDirection: 'row',
@@ -77,6 +120,31 @@ const styles = StyleSheet.create({
     closeButton: {
         fontSize: 24,
         color: '#888',
+    },
+    daySelectionContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#333',
+        borderRadius: 12,
+        padding: 4,
+        marginBottom: 20,
+    },
+    dayTab: {
+        flex: 1,
+        paddingVertical: 10,
+        alignItems: 'center',
+        borderRadius: 10,
+    },
+    selectedDayTab: {
+        backgroundColor: '#00AA00',
+    },
+    dayText: {
+        color: '#888',
+        fontWeight: '600',
+        fontSize: 14,
+    },
+    selectedDayText: {
+        color: '#FFFFFF',
+        fontWeight: 'bold',
     },
     modalLoader: {
         marginTop: 50,

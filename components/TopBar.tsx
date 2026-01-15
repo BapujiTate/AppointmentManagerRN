@@ -3,6 +3,8 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-nativ
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import { icontheme } from '../theme/icontheme';
+import AppIcon from '../view/AppIcon';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -18,7 +20,7 @@ export default function TopBar() {
                     <View style={styles.locationHeader}>
                         <View style={styles.homeIndicator} />
                         <Text style={styles.homeText}>Home</Text>
-                        <Text style={styles.dropdownIcon}>▼</Text>
+                        <AppIcon name="chevron-down" size={icontheme.iconSizes.xs} color={icontheme.colors.primary} />
                     </View>
                     <Text style={styles.addressText}>201, 2 Floor, Tower A3, Al...</Text>
                 </View>
@@ -26,7 +28,7 @@ export default function TopBar() {
                 <View style={styles.actionButtons}>
                     <TouchableOpacity
                         style={styles.profileBadge}
-                        onPress={() => navigation.navigate('ProfileEdit')}
+                        onPress={() => navigation.navigate('UserPreferences')}
                     >
                         <Text style={styles.profileText}>V</Text>
                     </TouchableOpacity>
@@ -35,10 +37,10 @@ export default function TopBar() {
 
             <View style={styles.searchContainer}>
                 <View style={styles.searchBar}>
-                    <Text style={styles.searchIcon}>🔍</Text>
+                    <AppIcon name="search" size={icontheme.iconSizes.md} color={icontheme.colors.primary} />
                     <TextInput
                         style={styles.searchInput}
-                        placeholder='Search Shop..."'
+                        placeholder='Search Shop...'
                         placeholderTextColor="#888"
                         editable={true}
                         autoCorrect={false}
