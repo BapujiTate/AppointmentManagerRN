@@ -1,8 +1,11 @@
-import React from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import { useUserLocation } from '../hooks/useUserLocation';
+import { useUserProfile } from '../hooks/useUserProfile';
+import LocationSelectModal from './LocationSelectModal';
 import { icontheme } from '../theme/icontheme';
 import AppIcon from '../view/AppIcon';
 
@@ -10,6 +13,15 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function TopBar() {
     const navigation = useNavigation<NavigationProp>();
+    const { location, isLoading: locationLoading } = useUserLocation();
+    const { profile, isLoading: profileLoading } = useUserProfile();
+    const [isLocationModalVisible, setIsLocationModalVisible] = useState(false);
+
+    // Helper function to truncate address
+    const truncateAddress = (address: string, maxLength: number = 30): string => {
+        if (address.length <= maxLength) return address;
+        return address.substring(0, maxLength) + '...';
+    };
 
     return (
         <View style={styles.container}>
@@ -17,12 +29,26 @@ export default function TopBar() {
             <View style={styles.topRow}>
                 {/* Left: Location Section */}
                 <View style={styles.locationSection}>
-                    <View style={styles.locationHeader}>
+                    <TouchableOpacity
+                        style={styles.locationHeader}
+                        onPress={() => setIsLocationModalVisible(true)}
+                        activeOpacity={0.7}
+                    >
                         <View style={styles.homeIndicator} />
-                        <Text style={styles.homeText}>Home</Text>
+                        <Text style={styles.homeText}>
+                            {location?.label || 'Home'}
+                        </Text>
                         <AppIcon name="chevron-down" size={icontheme.iconSizes.xs} color={icontheme.colors.primary} />
-                    </View>
-                    <Text style={styles.addressText}>201, 2 Floor, Tower A3, Al...</Text>
+                    </TouchableOpacity>
+                    {locationLoading ? (
+                        <ActivityIndicator size="small" color="#888" style={styles.loader} />
+                    ) : (
+                        <Text style={styles.addressText}>
+                            {location?.address
+                                ? truncateAddress(location.address)
+                                : '201, 2 Floor, Tower A3, Al...'}
+                        </Text>
+                    )}
                 </View>
 
                 <View style={styles.actionButtons}>
@@ -30,7 +56,13 @@ export default function TopBar() {
                         style={styles.profileBadge}
                         onPress={() => navigation.navigate('UserPreferences')}
                     >
-                        <Text style={styles.profileText}>V</Text>
+                        {profileLoading ? (
+                            <ActivityIndicator size="small" color="#FFFFFF" />
+                        ) : (
+                            <Text style={styles.profileText}>
+                                {profile?.initial || 'U'}
+                            </Text>
+                        )}
                     </TouchableOpacity>
                 </View>
             </View>
@@ -49,7 +81,19 @@ export default function TopBar() {
                     />
                 </View>
             </View>
-        </View>
+
+            {/* Location Selection Modal */}
+            <LocationSelectModal
+                visible={isLocationModalVisible}
+                onClose={() => setIsLocationModalVisible(false)}
+                currentLocation={location}
+                onAddNewAddress={() => {
+                    setIsLocationModalVisible(false);
+                    // TODO: Navigate to add address screen
+                    console.log('Add new address clicked');
+                }}
+            />
+        </View >
     );
 }
 
@@ -95,6 +139,10 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#888',
         marginLeft: 16,
+    },
+    loader: {
+        marginLeft: 16,
+        marginTop: 4,
     },
     actionButtons: {
         flexDirection: 'row',
