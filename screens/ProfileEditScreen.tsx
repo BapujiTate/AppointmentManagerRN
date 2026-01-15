@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import {
     View,
     Text,
-    TextInput,
     StyleSheet,
     TouchableOpacity,
     ScrollView,
     Alert,
 } from 'react-native';
+import { TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import AppIcon from '../view/AppIcon';
+import PhotoOptionsModal from '../view/PhotoOptionsModal';
+import { icontheme } from '../theme/icontheme';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -20,10 +23,13 @@ export default function ProfileEditScreen() {
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [mobileNumber, setMobileNumber] = useState('');
+    const [dob, setDob] = useState('');
+    const [gender, setGender] = useState('');
+    const [photoModalVisible, setPhotoModalVisible] = useState(false);
 
     const handleSave = () => {
         // Basic validation
-        if (!firstName || !lastName || !email || !mobileNumber) {
+        if (!firstName || !lastName || !email || !mobileNumber || !dob || !gender) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
@@ -49,7 +55,7 @@ export default function ProfileEditScreen() {
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Text style={styles.backIcon}>←</Text>
+                    <AppIcon name="arrow-left" size={icontheme.iconSizes.sm} color={icontheme.colors.primary} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Edit Profile</Text>
                 <View style={styles.placeholder} />
@@ -60,23 +66,23 @@ export default function ProfileEditScreen() {
                 <View style={styles.profileSection}>
                     <View style={styles.profilePictureContainer}>
                         <View style={styles.profileBadge}>
-                            <Text style={styles.profileText}>V</Text>
+                            <AppIcon name="user" size={icontheme.iconSizes.lg} color={icontheme.colors.primary} />
                         </View>
-                        <TouchableOpacity style={styles.cameraButton}>
-                            <Text style={styles.cameraIcon}>📷</Text>
+                        <TouchableOpacity style={styles.cameraButton} onPress={() => setPhotoModalVisible(true)}>
+                            <AppIcon name="camera" size={icontheme.iconSizes.sm} color={icontheme.colors.primary} />
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity>
-                        <Text style={styles.changePhotoText}>Change Photo</Text>
-                    </TouchableOpacity>
                 </View>
 
                 {/* Form Section */}
                 <View style={styles.formSection}>
                     {/* First Name */}
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>First Name</Text>
                         <TextInput
+                            label="First Name"
+                            mode="outlined"
+                            textColor="#FFFFFF"
+                            theme={{ colors: { onSurfaceVariant: '#888888', outline: '#444444' } }}
                             style={styles.input}
                             placeholder="Enter first name"
                             placeholderTextColor="#666"
@@ -87,8 +93,11 @@ export default function ProfileEditScreen() {
 
                     {/* Last Name */}
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Last Name</Text>
                         <TextInput
+                            label="Last Name"
+                            mode="outlined"
+                            textColor="#FFFFFF"
+                            theme={{ colors: { onSurfaceVariant: '#888888', outline: '#444444' } }}
                             style={styles.input}
                             placeholder="Enter last name"
                             placeholderTextColor="#666"
@@ -99,8 +108,11 @@ export default function ProfileEditScreen() {
 
                     {/* Email */}
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Email</Text>
                         <TextInput
+                            label="Email"
+                            mode="outlined"
+                            textColor="#FFFFFF"
+                            theme={{ colors: { onSurfaceVariant: '#888888', outline: '#444444' } }}
                             style={styles.input}
                             placeholder="email@example.com"
                             placeholderTextColor="#666"
@@ -113,14 +125,47 @@ export default function ProfileEditScreen() {
 
                     {/* Mobile Number */}
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Mobile Number</Text>
                         <TextInput
+                            label="Mobile Number"
+                            mode="outlined"
+                            textColor="#FFFFFF"
+                            theme={{ colors: { onSurfaceVariant: '#888888', outline: '#444444' } }}
                             style={styles.input}
                             placeholder="+1 (555) 123-4567"
                             placeholderTextColor="#666"
                             value={mobileNumber}
                             onChangeText={setMobileNumber}
                             keyboardType="phone-pad"
+                        />
+                    </View>
+
+                    {/* Date of Birth */}
+                    <View style={styles.inputGroup}>
+                        <TextInput
+                            label="Date of Birth"
+                            mode="outlined"
+                            textColor="#FFFFFF"
+                            theme={{ colors: { onSurfaceVariant: '#888888', outline: '#444444' } }}
+                            style={styles.input}
+                            placeholder="DD/MM/YYYY"
+                            placeholderTextColor="#666"
+                            value={dob}
+                            onChangeText={setDob}
+                        />
+                    </View>
+
+                    {/* Gender */}
+                    <View style={styles.inputGroup}>
+                        <TextInput
+                            label="Gender"
+                            mode="outlined"
+                            textColor="#FFFFFF"
+                            theme={{ colors: { onSurfaceVariant: '#888888', outline: '#444444' } }}
+                            style={styles.input}
+                            placeholder="Male / Female / Other"
+                            placeholderTextColor="#666"
+                            value={gender}
+                            onChangeText={setGender}
                         />
                     </View>
                 </View>
@@ -130,6 +175,23 @@ export default function ProfileEditScreen() {
                     <Text style={styles.saveButtonText}>Save Changes</Text>
                 </TouchableOpacity>
             </ScrollView>
+
+            <PhotoOptionsModal
+                visible={photoModalVisible}
+                onClose={() => setPhotoModalVisible(false)}
+                onDelete={() => {
+                    setPhotoModalVisible(false);
+                    // Handle delete
+                }}
+                onGallery={() => {
+                    setPhotoModalVisible(false);
+                    // Handle gallery
+                }}
+                onCamera={() => {
+                    setPhotoModalVisible(false);
+                    // Handle camera
+                }}
+            />
         </View>
     );
 }
@@ -142,11 +204,9 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: 50,
+        paddingTop: 10,
         paddingHorizontal: 16,
         paddingBottom: 16,
-        backgroundColor: '#1a1a1a',
     },
     backButton: {
         width: 40,
@@ -154,10 +214,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    backIcon: {
-        fontSize: 28,
-        color: '#FFFFFF',
-    },
+
     headerTitle: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -211,11 +268,6 @@ const styles = StyleSheet.create({
     cameraIcon: {
         fontSize: 18,
     },
-    changePhotoText: {
-        fontSize: 16,
-        color: '#4169E1',
-        fontWeight: '600',
-    },
     formSection: {
         marginBottom: 24,
     },
@@ -231,10 +283,7 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: '#2a2a2a',
         borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        fontSize: 16,
-        color: '#FFFFFF',
+        fontSize: 14,
     },
     saveButton: {
         backgroundColor: '#4169E1',

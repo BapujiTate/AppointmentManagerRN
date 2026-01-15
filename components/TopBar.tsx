@@ -6,6 +6,8 @@ import { RootStackParamList } from '../types/navigation';
 import { useUserLocation } from '../hooks/useUserLocation';
 import { useUserProfile } from '../hooks/useUserProfile';
 import LocationSelectModal from './LocationSelectModal';
+import { icontheme } from '../theme/icontheme';
+import AppIcon from '../view/AppIcon';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -36,7 +38,7 @@ export default function TopBar() {
                         <Text style={styles.homeText}>
                             {location?.label || 'Home'}
                         </Text>
-                        <Text style={styles.dropdownIcon}>▼</Text>
+                        <AppIcon name="chevron-down" size={icontheme.iconSizes.xs} color={icontheme.colors.primary} />
                     </TouchableOpacity>
                     {locationLoading ? (
                         <ActivityIndicator size="small" color="#888" style={styles.loader} />
@@ -52,7 +54,7 @@ export default function TopBar() {
                 <View style={styles.actionButtons}>
                     <TouchableOpacity
                         style={styles.profileBadge}
-                        onPress={() => navigation.navigate('ProfileEdit')}
+                        onPress={() => navigation.navigate('UserPreferences')}
                     >
                         {profileLoading ? (
                             <ActivityIndicator size="small" color="#FFFFFF" />
@@ -67,10 +69,10 @@ export default function TopBar() {
 
             <View style={styles.searchContainer}>
                 <View style={styles.searchBar}>
-                    <Text style={styles.searchIcon}>🔍</Text>
+                    <AppIcon name="search" size={icontheme.iconSizes.md} color={icontheme.colors.primary} />
                     <TextInput
                         style={styles.searchInput}
-                        placeholder='Search Shop..."'
+                        placeholder='Search Shop...'
                         placeholderTextColor="#888"
                         editable={true}
                         autoCorrect={false}
@@ -91,7 +93,7 @@ export default function TopBar() {
                     console.log('Add new address clicked');
                 }}
             />
-        </View>
+        </View >
     );
 }
 
